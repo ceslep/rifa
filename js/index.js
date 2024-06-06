@@ -86,8 +86,7 @@ function init() {
     buttoninit.click();
   };
 
-  if(Grado) generate(Grado)
-
+ 
 
   wheel.onCurrentIndexChange = e => {
     console.log(e);
@@ -116,7 +115,11 @@ function init() {
     wheel.spinToItem(index) */
   })
 
- 
+  if(Grado) {
+    generate(Grado);
+    button.click();
+  }
+
   // Save object globally for easy debugging.
   window.wheel = wheel;
 
