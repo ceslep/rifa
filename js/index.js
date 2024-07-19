@@ -105,7 +105,7 @@ function init() {
     window.location.href=`./?grado=${dropdowng.value}`;
   });
   button.addEventListener('click', e => {
-    generate(dropdowng.value)
+    generate(dropdowng.value);
     let signo = (Math.floor(0.5 - Math.random()));
     signo = signo < 0 ? signo : 1;
     console.log(signo)
