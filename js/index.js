@@ -117,6 +117,9 @@ function init() {
      setTimeout(()=>{
       document.getElementById("canvas").style.display='none'
      },13000)
+     const audioElement = document.createElement('audio');
+     audioElement.src = 'aplauso.mp3';
+     audioElement.play();
      await Swal.fire({
       title:"Ganador",
       html:`<h1 style='font-size:3rem;'>${wheel.items[e.currentIndex]._label}</h1>`
