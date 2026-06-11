@@ -13,17 +13,24 @@
 
 <body>
   <canvas id="canvas" style="display:none;position:absolute;z-index:4000"></canvas>
+
+  <header class="topbar">
+    <p class="kicker">Día de la Familia</p>
+    <h1>Gran Rifa <em>2026</em></h1>
+  </header>
+
   <div class="gui-wrapper">
-  
-    <div class="dgrid"><div><label style="display:none;">Theme:</label><select style="display:none;" class="select1"></select>
-    <label>Grado:</label><select class="select2"></select></div>
-    <span class="item" style="min-width:350px;width:350px;max-width:350px;"></span> 
-    <button id="spininit" style="margin-right: 19;">Init</button> 
-    <button id="spin" style="margin-right: 19;">Spin</button> 
-    </dgrid>
+    <div class="dgrid">
+      <div><label>Grado</label><select class="select2"></select></div>
+      <span class="item"></span>
+      <button id="spininit">Init</button>
+      <button id="spin">Girar</button>
+    </div>
   </div>
 
   <div class="wheel-wrapper"></div>
+
+  <video class="corner-video" src="mp4.mp4" autoplay loop muted playsinline></video>
 </body>
 
 </html>

@@ -9,13 +9,10 @@ window.onload = async () => {
   await loadFonts(props.map(i => i.itemLabelFont));
   const urlParams = new URLSearchParams(window.location.search);
   Grado=urlParams.get('grado');
-  console.log(Grado)
   init();
 };
 
 function init() {
-
-  console.log(props);
 
   const sgrados = props.filter(p => p.name == 'Students').map(e => e.items)[0].map(e => {
     const s = e.label;
@@ -25,16 +22,9 @@ function init() {
   grados = ['', ...grados];
   const wheel = new Wheel(document.querySelector('.wheel-wrapper'));
 
-  const dropdown = document.querySelector('.select1');
   const dropdowng = document.querySelector('.select2');
-  // Initalise dropdown with the names of each example:
-  for (const p of props) {
-    const opt = document.createElement('option');
-    opt.textContent = p.name;
-    dropdown.append(opt);
-  }
 
-dropdowng.append(document.createElement('option'));
+  dropdowng.append(document.createElement('option'));
 
   for (const g of grados) {
     if (g == '') continue;
@@ -43,101 +33,78 @@ dropdowng.append(document.createElement('option'));
     dropdowng.append(opt);
   }
 
-  console.log(dropdowng) 
-
-  if (Grado) dropdowng.value=Grado;
-  // Handle dropdown change:
-  dropdown.onchange = () => {
-    wheel.init({
-      ...props[dropdown.selectedIndex],
-      rotation: wheel.rotation, // Preserve value.
-    });
-  };
+  if (Grado) dropdowng.value = Grado;
 
   let interval;
 
-  // Select default:
-  dropdown.options[0].selected = 'selected';
-  dropdown.onchange();
-  
+  // Audio de aplausos: precargado y reutilizado.
+  const aplauso = new Audio('aplauso.mp3');
+  aplauso.preload = 'auto';
 
-
+  // Initialise wheel with the Students props:
+  wheel.init({
+    ...props[0],
+    rotation: wheel.rotation, // Preserve value.
+  });
 
   const generate = (value) => {
-    console.log(value)
     if (interval) clearInterval(interval);
-    //const value=e.target.value;
-    props[0].items = [...egrados];
 
-    const props2 = [...props];
-    props2[0].items = props[0].items.filter(g => g.label.includes(`-${value}`)).sort((a, b) => 0.5 - Math.random()).map(p => {
-      const name = p.label;
-      const sname = name.substring(0, name.indexOf('-'))
-      return {
-        label: sname
-      }
-    });
+    // Sin grado: gira con todos. Con grado: solo ese grado.
+    const source = value
+      ? egrados.filter(g => g.label.slice(g.label.lastIndexOf('-') + 1) === value)
+      : egrados;
+    const items = source
+      .slice()
+      .sort(() => 0.5 - Math.random())
+      .map(p => ({ label: p.label.substring(0, p.label.indexOf('-')) }));
+
     wheel.init({
-      ...props2[0],
+      ...props[0],
+      items,
       rotation: wheel.rotation, // Preserve value.
     });
     interval = setInterval(() => {
-      const item = document.querySelector(".item")
-      item.textContent = wheel.items[wheel._currentIndex].label;
+      const current = wheel.items[wheel._currentIndex];
+      if (!current) return;
+      document.querySelector(".item").textContent = current.label;
     }, 100)
   }
   dropdowng.onchange = (e) => {
-   // generate(dropdowng.value)
     buttoninit.click();
   };
 
- 
-
   wheel.onCurrentIndexChange = e => {
-    console.log(e);
-    const item = document.querySelector(".item")
-    item.textContent = wheel.items[wheel._currentIndex].label;
+    const current = wheel.items[wheel._currentIndex];
+    if (!current) return;
+    document.querySelector(".item").textContent = current.label;
   }
-  wheel.onRest = e => console.log(e);
-  wheel.onSpin = e => console.log(e);
-
-  wheel.onchange=e=>console.log(e)
 
   const button = document.getElementById("spin");
   const buttoninit = document.getElementById("spininit");
-  buttoninit.addEventListener("click",e=>{
-    console.log("...")
-    window.location.href=`./?grado=${dropdowng.value}`;
+  buttoninit.addEventListener("click", e => {
+    window.location.href = `./?grado=${dropdowng.value}`;
   });
   button.addEventListener('click', e => {
-    generate(dropdowng.value);
+    const grado = dropdowng.value;
+    // Desbloquea el audio dentro del gesto del usuario (política de autoplay).
+    aplauso.play().then(() => { aplauso.pause(); aplauso.currentTime = 0; }).catch(() => {});
+    generate(grado); // sin grado: gira con todos los datos
     let signo = (Math.floor(0.5 - Math.random()));
     signo = signo < 0 ? signo : 1;
-    console.log(signo)
     wheel.spin(signo * (Math.floor(5000 * Math.random()) + Math.floor(10000 * Math.random())));
     wheel.onRest = async e => {
-      console.log(e)
-     console.log(wheel.items[e.currentIndex]._label)
      document.getElementById("canvas").style.display='';
      setTimeout(()=>{
       document.getElementById("canvas").style.display='none'
      },13000)
-     const audioElement = document.createElement('audio');
-     audioElement.src = 'aplauso.mp3';
-     audioElement.play();
+     aplauso.currentTime = 0;
+     aplauso.play().catch(err => console.warn('No se pudo reproducir audio:', err));
      await Swal.fire({
       title:"Ganador",
       html:`<h1 style='font-size:3rem;'>${wheel.items[e.currentIndex]._label}</h1>`
      })
     };
-    wheel.onSpin = e => console.log(e);
-  
-    wheel.onchange=e=>console.log(e)
-    /*  const index=wheel.items.findIndex((value) => {
-      return value.label.includes('SARA MANUELA')
-    }); 
-    console.log(index);
-    wheel.spinToItem(index) */
   })
 
   if(Grado) {
