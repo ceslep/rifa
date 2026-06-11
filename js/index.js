@@ -34,11 +34,16 @@ function init() {
     dropdown.append(opt);
   }
 
+dropdowng.append(document.createElement('option'));
+
   for (const g of grados) {
+    if (g == '') continue;
     const opt = document.createElement('option');
     opt.textContent = g;
     dropdowng.append(opt);
   }
+
+  console.log(dropdowng) 
 
   if (Grado) dropdowng.value=Grado;
   // Handle dropdown change:
