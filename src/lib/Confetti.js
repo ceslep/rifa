@@ -1,8 +1,10 @@
+/** @param {HTMLCanvasElement} canvas */
 export function createConfetti(canvas) {
-  const context = canvas.getContext("2d");
+  const context = /** @type {CanvasRenderingContext2D} */ (canvas.getContext("2d"));
   let W = window.innerWidth;
   let H = window.innerHeight;
   const maxConfettis = 150;
+  /** @type {any[]} */
   const particles = [];
 
   const possibleColors = [
@@ -11,6 +13,7 @@ export function createConfetti(canvas) {
     "SandyBrown", "Chocolate", "Crimson"
   ];
 
+  /** @param {number} from @param {number} to */
   function randomFromTo(from, to) {
     return Math.floor(Math.random() * (to - from + 1) + from);
   }
@@ -39,7 +42,8 @@ export function createConfetti(canvas) {
     particles.push(new ConfettiParticle());
   }
 
-  let animationId;
+  /** @type {number | null} */
+  let animationId = null;
 
   function Draw() {
     animationId = requestAnimationFrame(Draw);
@@ -78,12 +82,12 @@ export function createConfetti(canvas) {
       if (!animationId) Draw();
     },
     stop: () => {
-      cancelAnimationFrame(animationId);
+      if (animationId !== null) cancelAnimationFrame(animationId);
       animationId = null;
       context.clearRect(0, 0, W, H);
     },
     destroy: () => {
-      cancelAnimationFrame(animationId);
+      if (animationId !== null) cancelAnimationFrame(animationId);
       window.removeEventListener("resize", resize);
     }
   };

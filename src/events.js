@@ -1,3 +1,4 @@
+// @ts-nocheck
 export function register(wheel = {}) {
 
   registerPointerEvents(wheel);

@@ -4,16 +4,22 @@
   import { loadFonts } from './util.js';
   import { props } from './lib/props.js';
   import { egrados as initialEgrados } from './lib/egrados.js';
+  import { noganan } from './lib/noganan.js';
   import { createConfetti } from './lib/Confetti.js';
   import Settings from './lib/Settings.svelte';
   import Swal from 'sweetalert2';
 
+  /** @type {any} */
   let wheel;
+  /** @type {HTMLElement} */
   let wheelContainer;
+  /** @type {HTMLCanvasElement} */
   let canvas;
+  /** @type {ReturnType<typeof createConfetti>} */
   let confetti;
   let selectedGrado = '';
   let currentItemLabel = '';
+  /** @type {ReturnType<typeof setInterval> | undefined} */
   let interval;
   let showCanvas = false;
   let showSettings = false;
@@ -22,20 +28,36 @@
 
   const RIFADOS_KEY = 'gruposRifados';
   const DATA_KEY = 'egradosData';
-  
+  const GANADORES_KEY = 'estudiantesGanadores';
+
+  // Estudiantes excluidos del sorteo (no pueden ganar)
+  const noGananSet = new Set(noganan.map(n => n.label.trim()));
+
+  /** @type {string[]} */
   let rifados = [];
+  /** Estudiantes que ya ganaron (label completo NOMBRE-GRADO) @type {string[]} */
+  let ganadores = [];
+  /** @type {{ label: string }[]} */
   let currentEgrados = [];
 
   // Audio
+  /** @type {HTMLAudioElement} */
   let aplauso;
   let audioDesbloqueado = false;
 
   const loadInitialData = () => {
     // Cargar rifados
     try {
-      rifados = JSON.parse(localStorage.getItem(RIFADOS_KEY)) || [];
+      rifados = JSON.parse(localStorage.getItem(RIFADOS_KEY) || '[]') || [];
     } catch {
       rifados = [];
+    }
+
+    // Cargar estudiantes ganadores
+    try {
+      ganadores = JSON.parse(localStorage.getItem(GANADORES_KEY) || '[]') || [];
+    } catch {
+      ganadores = [];
     }
 
     // Cargar datos de estudiantes
@@ -52,10 +74,19 @@
     }
   };
 
+  /** @param {string} g */
   const addRifado = (g) => {
     if (g && !rifados.includes(g)) {
       rifados = [...rifados, g];
       localStorage.setItem(RIFADOS_KEY, JSON.stringify(rifados));
+    }
+  };
+
+  /** @param {string} label Label completo del estudiante (NOMBRE-GRADO) */
+  const addGanador = (label) => {
+    if (label && !ganadores.includes(label)) {
+      ganadores = [...ganadores, label];
+      localStorage.setItem(GANADORES_KEY, JSON.stringify(ganadores));
     }
   };
 
@@ -83,7 +114,7 @@
       rotation: wheel.rotation,
     });
 
-    wheel.onCurrentIndexChange = e => {
+    wheel.onCurrentIndexChange = (/** @type {any} */ e) => {
       const current = wheel.items[wheel._currentIndex];
       if (current) currentItemLabel = current.label;
     };
@@ -120,21 +151,25 @@
       aplauso.loop = false;
       aplauso.muted = false;
       aplauso.currentTime = 0;
-      aplauso.play().catch(err => console.warn('No se pudo reproducir audio:', err));
+      aplauso.play().catch((/** @type {any} */ err) => console.warn('No se pudo reproducir audio:', err));
     }
   };
 
+  /** @param {string} value */
   function handleGenerate(value) {
     if (interval) clearInterval(interval);
 
-    const source = value
+    const ganadoresSet = new Set(ganadores.map(g => g.trim()));
+
+    const source = (value
       ? currentEgrados.filter(g => g.label.slice(g.label.lastIndexOf('-') + 1) === value)
-      : currentEgrados;
+      : currentEgrados
+    ).filter(g => !ganadoresSet.has(g.label.trim()));
 
     const items = source
       .slice()
       .sort(() => 0.5 - Math.random())
-      .map(p => ({ label: p.label.substring(0, p.label.indexOf('-')) }));
+      .map(p => ({ label: p.label.substring(0, p.label.indexOf('-')), value: p.label }));
 
     wheel.init({
       ...props[0],
@@ -156,7 +191,19 @@
     signo = signo < 0 ? signo : 1;
     wheel.spin(signo * (Math.floor(5000 * Math.random()) + Math.floor(10000 * Math.random())));
 
-    wheel.onRest = async e => {
+    wheel.onRest = async (/** @type {any} */ e) => {
+      const ganador = wheel.items[e.currentIndex];
+
+      // Si el ganador esta en la lista de excluidos, volver a girar
+      // (a menos que TODOS los items esten excluidos, para evitar bucle infinito)
+      const hayElegibles = wheel.items.some((/** @type {any} */ it) => !noGananSet.has(String(it.value).trim()));
+      if (hayElegibles && ganador && noGananSet.has(String(ganador.value).trim())) {
+        let s = Math.floor(0.5 - Math.random());
+        s = s < 0 ? s : 1;
+        wheel.spin(s * (Math.floor(5000 * Math.random()) + Math.floor(10000 * Math.random())));
+        return;
+      }
+
       showCanvas = true;
       confetti.start();
       setTimeout(() => {
@@ -182,6 +229,9 @@
         aplauso.currentTime = 0;
       }
 
+      // Registrar al ganador para que no vuelva a salir en ningun sorteo
+      if (ganador && ganador.value) addGanador(String(ganador.value));
+
       if (selectedGrado) {
         addRifado(selectedGrado);
         selectedGrado = ''; // Reset select
@@ -194,6 +244,7 @@
     handleSpin();
   }
 
+  /** @param {CustomEvent<{ newData: { label: string }[] }>} event */
   function handleSaveData(event) {
     currentEgrados = event.detail.newData;
     localStorage.setItem(DATA_KEY, JSON.stringify(currentEgrados));
@@ -202,7 +253,9 @@
 
   function handleResetRifados() {
     rifados = [];
+    ganadores = [];
     localStorage.removeItem(RIFADOS_KEY);
+    localStorage.removeItem(GANADORES_KEY);
   }
 
 </script>

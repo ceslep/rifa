@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Get a random integer between `min` (inclusive) and `max` (exclusive).
  */

@@ -196,14 +196,16 @@ function init() {
      },13000)
      sonarAplauso();
      const animRnd = Math.floor(Math.random() * 5) + 1; // 1..5 aleatorio
-     await Swal.fire({
-      title:"Ganador",
-      width:'90%',
-      html:`<div style='display:flex;align-items:center;justify-content:center;gap:1.5rem;flex-wrap:wrap;'>
-        <h1 class='ganador-nombre anim-${animRnd}' style='font-size:5rem;margin:0;flex:1;min-width:300px;line-height:1.1;'>${wheel.items[e.currentIndex]._label}</h1>
-        <img class='ganador-img' src='./ganador-sin-fondo.png' alt='Ganador' style='width:200px;height:auto;flex-shrink:0;'/>
-      </div>`
-     })
+await Swal.fire({
+       title:"Ganador",
+       width:'90%',
+       background:'#111',
+       color:'#fff',
+       html:`<div style='display:flex;align-items:center;justify-content:center;gap:1.5rem;flex-wrap:wrap;'>
+         <h1 class='ganador-nombre anim-${animRnd}' style='font-size:5rem;margin:0;flex:1;min-width:300px;line-height:1.1;color:#fff;'>${wheel.items[e.currentIndex]._label}</h1>
+         <img class='ganador-img' src='@public/au6h6r.gif' alt='Ganador' style='width:200px;height:auto;flex-shrink:0;'/>
+       </div>`
+      })
      // Marca el grupo como rifado y lo quita del select.
      if (grado) {
        addRifado(grado);

@@ -1,0 +1,21 @@
+{
+  "hash": "ebf545f0",
+  "configHash": "0c4294d0",
+  "lockfileHash": "3b9740db",
+  "browserHash": "1a2162f2",
+  "optimized": {
+    "svelte": {
+      "src": "../../node_modules/svelte/src/index-client.js",
+      "file": "svelte.js",
+      "fileHash": "214ef1bd",
+      "needsInterop": false
+    },
+    "sweetalert2": {
+      "src": "../../node_modules/sweetalert2/dist/sweetalert2.all.js",
+      "file": "sweetalert2.js",
+      "fileHash": "74550154",
+      "needsInterop": true
+    }
+  },
+  "chunks": {}
+}

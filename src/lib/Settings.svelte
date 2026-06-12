@@ -4,9 +4,12 @@
 
   const dispatch = createEventDispatcher();
 
+  /** @type {string[]} */
   export let rifados = [];
+  /** @type {{ label: string }[]} */
   export let currentData = [];
 
+  /** @type {{ label: string }[]} */
   let participants = [];
   $: {
     if (participants.length === 0 && currentData.length > 0) {
@@ -32,10 +35,12 @@
     participants = [{ label: "NUEVO ESTUDIANTE-GRADO" }, ...participants];
   }
 
+  /** @param {number} index */
   function removeParticipant(index) {
     participants = participants.filter((_, i) => i !== index);
   }
 
+  /** @param {string} grado */
   function removeRifado(grado) {
     const updatedRifados = rifados.filter(g => g !== grado);
     localStorage.setItem(RIFADOS_KEY, JSON.stringify(updatedRifados));

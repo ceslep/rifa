@@ -276,7 +276,6 @@ export const egrados = [
   { label: "CARMONA OSPINA KEVIN SNEIDER-901" },
   { label: "CARMONA RESTREPO SINDY JULIANA-901" },
   { label: "CASTAÑEDA RAMIREZ SALOME-901" },
-  { label: "CORDERO MARIN SAMUEL-901" },
   { label: "HIGUITA OSSA EMANUEL-901" },
   { label: "HOYOS AGUDELO JOHAN STEBAN-901" },
   { label: "LEON MAYA SAMUEL SANTIAGO-901" },

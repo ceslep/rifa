@@ -382,6 +382,10 @@ canvas#canvas {
   font-size: 1rem !important;
 }
 
+.swal2-html-container {
+  overflow: hidden !important;
+}
+
 .swal2-html-container h1 {
   font-family: var(--font-display) !important;
   font-weight: 900 !important;
