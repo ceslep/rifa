@@ -1,0 +1,437 @@
+/* ============================================================
+   Rifa 2026 — Día de la Familia
+   Tema: festivo-refinado · esmeralda + oro + crema
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,900&family=Outfit:wght@300;400;500;600;700&family=Pragati+Narrow:wght@400;700&display=swap');
+
+:root {
+  --carmin: #047857;       /* esmeralda */
+  --carmin-dark: #065f46;  /* jade */
+  --carmin-deep: #032b20;  /* verde profundo */
+  --gold: #eab308;
+  --gold-soft: #fde68a;
+  --cream: #fef9c3;
+  --ink: #052e23;
+  --bg-0: #0a3b2c;
+  --bg-1: #042018;
+
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Outfit', system-ui, sans-serif;
+
+  --shadow-soft: 0 10px 40px -12px rgba(0, 0, 0, 0.65);
+  --shadow-gold: 0 0 0 1px rgba(234, 179, 8, 0.35), 0 18px 60px -18px rgba(4, 120, 87, 0.55);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  overscroll-behavior-y: contain;
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  touch-action: none;
+  user-select: none;
+
+  display: flex;
+  flex-direction: column;
+
+  font-family: var(--font-body);
+  color: var(--cream);
+
+  /* Fondo atmosférico: radiales cálidos sobre verde profundo */
+  background:
+    radial-gradient(120% 80% at 50% -10%, rgba(234, 179, 8, 0.18), transparent 55%),
+    radial-gradient(90% 60% at 85% 110%, rgba(4, 120, 87, 0.5), transparent 60%),
+    radial-gradient(70% 50% at 10% 90%, rgba(6, 95, 70, 0.55), transparent 55%),
+    linear-gradient(160deg, var(--bg-0), var(--bg-1));
+}
+
+/* Grano sutil sobre todo el fondo */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ----------------------- Encabezado ----------------------- */
+
+.topbar {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: clamp(10px, 2.2vh, 22px) 16px 4px;
+}
+
+.topbar .kicker {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: clamp(0.6rem, 1.4vw, 0.78rem);
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: var(--gold);
+
+  /* Pulso de tracking + brillo en bucle */
+  opacity: 0.9;
+  animation: kicker-loop 4s ease-in-out infinite;
+}
+
+.title-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(10px, 2vw, 20px);
+  margin-top: 2px;
+}
+
+.header-logo {
+  height: clamp(40px, 8vw, 75px);
+  width: auto;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
+  animation: logo-float 5s ease-in-out infinite;
+}
+
+@keyframes logo-float {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-5px) scale(1.05); }
+}
+
+.topbar h1 {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(1.6rem, 5.5vw, 3rem);
+  line-height: 0.95;
+  letter-spacing: -0.01em;
+  margin-top: 2px;
+
+  /* Degradado animado para el efecto de brillo dorado */
+  background: linear-gradient(100deg, var(--cream) 20%, var(--gold) 45%, #fffbe6 50%, var(--gold) 55%, var(--gold-soft) 80%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 2px 30px rgba(234, 179, 8, 0.25);
+
+  /* Brillo dorado en barrido + flotación suave, ambos en bucle */
+  animation:
+    title-shine 4s ease-in-out infinite,
+    title-float 5s ease-in-out infinite;
+}
+
+@keyframes title-shine {
+  0%, 100% { background-position: 100% 0; }
+  50%      { background-position: 0% 0; }
+}
+
+@keyframes title-float {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-5px) scale(1.015); }
+}
+
+.topbar h1 em {
+  font-style: italic;
+  font-weight: 500;
+  color: var(--gold);
+  -webkit-text-fill-color: var(--gold);
+  display: inline-block;
+  animation: em-pulse 2.2s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+}
+
+@keyframes em-pulse {
+  0%, 100% { transform: scale(1) rotate(0); text-shadow: 0 0 0 rgba(234, 179, 8, 0); }
+  50%      { transform: scale(1.12) rotate(-2deg); text-shadow: 0 0 22px rgba(234, 179, 8, 0.6); }
+}
+
+/* Respeta a quien prefiere menos movimiento */
+@media (prefers-reduced-motion: reduce) {
+  .topbar .kicker,
+  .topbar h1,
+  .topbar h1 em {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+  .topbar .kicker { opacity: 0.9; }
+}
+
+/* ----------------------- Panel de control ----------------------- */
+
+.gui-wrapper {
+  position: relative;
+  z-index: 2;
+  padding: clamp(8px, 1.6vh, 14px) clamp(12px, 3vw, 28px);
+  display: flex;
+  justify-content: center;
+}
+
+.dgrid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px 14px;
+
+  width: min(960px, 100%);
+  padding: 12px 16px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(251, 244, 230, 0.08), rgba(251, 244, 230, 0.03));
+  border: 1px solid rgba(234, 179, 8, 0.22);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-soft);
+}
+
+.dgrid > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+label {
+  font-weight: 600;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold-soft);
+}
+
+select {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--ink);
+  padding: 9px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(234, 179, 8, 0.5);
+  background: var(--cream);
+  cursor: pointer;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  min-width: 130px;
+}
+
+select:hover {
+  box-shadow: 0 0 0 3px rgba(234, 179, 8, 0.25);
+}
+
+select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(234, 179, 8, 0.45);
+}
+
+/* Nombre destacado del ítem actual */
+.item {
+  flex: 1 1 260px;
+  min-width: 0;
+  text-align: center;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(1rem, 2.4vw, 1.45rem);
+  letter-spacing: 0.01em;
+  color: var(--cream);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 4px 8px;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.4);
+}
+
+/* ----------------------- Botones ----------------------- */
+
+button {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cream);
+  padding: 10px 22px;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.15s ease, box-shadow 0.25s ease, filter 0.2s ease;
+}
+
+button:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+#spininit {
+  color: var(--gold-soft);
+  background: transparent;
+  border: 1.5px solid rgba(234, 179, 8, 0.55);
+}
+
+#spininit:hover {
+  background: rgba(234, 179, 8, 0.12);
+  box-shadow: 0 0 0 3px rgba(234, 179, 8, 0.15);
+}
+
+#spin {
+  background: linear-gradient(135deg, var(--gold), #b8860b);
+  color: var(--carmin-deep);
+  box-shadow: 0 8px 24px -8px rgba(234, 179, 8, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+#spin:hover {
+  filter: brightness(1.07);
+  box-shadow: 0 12px 32px -8px rgba(234, 179, 8, 0.95), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+/* ----------------------- Rueda ----------------------- */
+
+.wheel-wrapper {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Halo radiante detrás de la rueda */
+.wheel-wrapper::before {
+  content: '';
+  position: absolute;
+  width: min(86vmin, 720px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(234, 179, 8, 0.22), transparent 65%);
+  filter: blur(8px);
+  pointer-events: none;
+  z-index: 0;
+  animation: halo 6s ease-in-out infinite;
+}
+
+@keyframes halo {
+  0%, 100% { transform: scale(1); opacity: 0.75; }
+  50%      { transform: scale(1.05); opacity: 1; }
+}
+
+.wheel-wrapper canvas {
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 24px 50px rgba(0, 0, 0, 0.55));
+}
+
+/* ----------------------- Video esquina ----------------------- */
+
+.corner-video {
+  position: fixed;
+  left: clamp(10px, 2vw, 22px);
+  bottom: clamp(10px, 2vh, 22px);
+  z-index: 3;
+  width: clamp(120px, 18vw, 220px);
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 2px solid rgba(234, 179, 8, 0.55);
+  box-shadow: var(--shadow-soft);
+  pointer-events: none;
+  background: #000;
+}
+
+@media (max-width: 600px) {
+  .corner-video { width: clamp(96px, 32vw, 140px); }
+}
+
+/* ----------------------- Confeti ----------------------- */
+
+canvas#canvas {
+  width: 100%;
+  overflow: hidden;
+  margin: 0;
+  pointer-events: none; /* el confeti nunca bloquea clics */
+}
+
+/* ----------------------- SweetAlert (modal ganador) ----------------------- */
+
+/* Por encima del confeti (canvas z-index 4000) para poder hacer clic */
+.swal2-container {
+  z-index: 10000 !important;
+}
+
+.swal2-popup {
+  border-radius: 22px !important;
+  background: linear-gradient(165deg, #fff, var(--cream)) !important;
+  border: 2px solid var(--gold) !important;
+  box-shadow: var(--shadow-gold) !important;
+}
+
+.swal2-title {
+  font-family: var(--font-body) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.18em !important;
+  text-transform: uppercase !important;
+  color: var(--carmin) !important;
+  font-size: 1rem !important;
+}
+
+.swal2-html-container h1 {
+  font-family: var(--font-display) !important;
+  font-weight: 900 !important;
+  color: var(--ink) !important;
+  line-height: 1.05 !important;
+}
+
+.swal2-confirm {
+  background: linear-gradient(135deg, var(--carmin), var(--carmin-dark)) !important;
+  border-radius: 999px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  padding: 10px 28px !important;
+}
+
+/* ----------------------- Responsive ----------------------- */
+
+@media (max-width: 600px) {
+  .dgrid {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .dgrid > div {
+    justify-content: space-between;
+  }
+  select {
+    flex: 1;
+  }
+  .item {
+    flex-basis: auto;
+    order: -1;
+  }
+  button {
+    width: 100%;
+  }
+  .topbar .kicker {
+    letter-spacing: 0.3em;
+  }
+}
+
+@media (max-height: 520px) and (orientation: landscape) {
+  .topbar { padding-top: 6px; }
+  .topbar h1 { font-size: clamp(1.2rem, 4vw, 1.8rem); }
+  .gui-wrapper { padding-top: 4px; padding-bottom: 4px; }
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}

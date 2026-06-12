@@ -1,4 +1,4 @@
-import { AlignText } from '../src/constants.js';
+import { AlignText } from '../constants.js';
 import {egrados} from "./egrados.js";
 
 export const props = [
@@ -21,7 +21,7 @@ export const props = [
     lineWidth: 1,
     rotationSpeedMax: 700,
     rotationResistance: -70,
-    overlayImage: './img/example-2-overlay.svg',
+    overlayImage: 'img/example-2-overlay.svg',
     items: egrados
   }
 ];

@@ -24,22 +24,116 @@ function init() {
 
   const dropdowng = document.querySelector('.select2');
 
-  dropdowng.append(document.createElement('option'));
+  // Grupos ya rifados guardados en localStorage (no se vuelven a mostrar).
+  const RIFADOS_KEY = 'gruposRifados';
+  const getRifados = () => {
+    try { return JSON.parse(localStorage.getItem(RIFADOS_KEY)) || []; }
+    catch { return []; }
+  };
+  const addRifado = (g) => {
+    const r = getRifados();
+    if (!r.includes(g)) { r.push(g); localStorage.setItem(RIFADOS_KEY, JSON.stringify(r)); }
+  };
 
-  for (const g of grados) {
-    if (g == '') continue;
-    const opt = document.createElement('option');
-    opt.textContent = g;
-    dropdowng.append(opt);
-  }
+  const rellenarSelect = () => {
+    const rifados = getRifados();
+    dropdowng.innerHTML = '';
+    dropdowng.append(document.createElement('option')); // opción vacía
+    for (const g of grados) {
+      if (g == '') continue;
+      if (rifados.includes(g)) continue; // ya rifado: ocultar
+      const opt = document.createElement('option');
+      opt.textContent = g;
+      dropdowng.append(opt);
+    }
+  };
+  rellenarSelect();
 
   if (Grado) dropdowng.value = Grado;
 
   let interval;
 
+  // Estilos de animación del ganador (inyectados una sola vez en <head>).
+  if (!document.getElementById('ganador-anim-style')) {
+    const st = document.createElement('style');
+    st.id = 'ganador-anim-style';
+    st.textContent = `
+      @keyframes ganadorBrillo {
+        0%, 100% { color:#d4af37; text-shadow:0 0 8px rgba(212,175,55,0.6); }
+        50% { color:#ff5e00; text-shadow:0 0 24px rgba(255,94,0,0.9); }
+      }
+      @keyframes ganadorFlota {
+        0%,100% { transform: translateY(0); }
+        50% { transform: translateY(-12px); }
+      }
+      .ganador-img { animation: ganadorFlota 2s ease-in-out infinite; }
+
+      /* 5 animaciones de entrada aleatorias */
+      @keyframes animPop {
+        0% { transform: scale(0.3); opacity: 0; }
+        60% { transform: scale(1.15); opacity: 1; }
+        100% { transform: scale(1); opacity: 1; }
+      }
+      @keyframes animSlide {
+        0% { transform: translateX(-120%); opacity: 0; }
+        100% { transform: translateX(0); opacity: 1; }
+      }
+      @keyframes animFlip {
+        0% { transform: rotateY(90deg); opacity: 0; }
+        100% { transform: rotateY(0); opacity: 1; }
+      }
+      @keyframes animShake {
+        0% { transform: translateX(0); opacity:0; }
+        10% { opacity:1; }
+        20% { transform: translateX(-15px); }
+        40% { transform: translateX(15px); }
+        60% { transform: translateX(-10px); }
+        80% { transform: translateX(10px); }
+        100% { transform: translateX(0); }
+      }
+      @keyframes animBounce {
+        0% { transform: translateY(-150%); opacity:0; }
+        60% { transform: translateY(20px); opacity:1; }
+        80% { transform: translateY(-10px); }
+        100% { transform: translateY(0); }
+      }
+      .ganador-nombre { animation-fill-mode: both; }
+      .anim-1 { animation: animPop .8s cubic-bezier(.18,.89,.32,1.28) both, ganadorBrillo 1.6s ease-in-out .8s infinite; }
+      .anim-2 { animation: animSlide .7s ease-out both, ganadorBrillo 1.6s ease-in-out .7s infinite; }
+      .anim-3 { animation: animFlip .8s ease-out both, ganadorBrillo 1.6s ease-in-out .8s infinite; }
+      .anim-4 { animation: animShake .9s ease-in-out both, ganadorBrillo 1.6s ease-in-out .9s infinite; }
+      .anim-5 { animation: animBounce 1s cubic-bezier(.28,.84,.42,1) both, ganadorBrillo 1.6s ease-in-out 1s infinite; }
+    `;
+    document.head.appendChild(st);
+  }
+
   // Audio de aplausos: precargado y reutilizado.
-  const aplauso = new Audio('aplauso.mp3');
+  const aplauso = new Audio('./aplauso.mp3');
   aplauso.preload = 'auto';
+  aplauso.volume = 1;
+  aplauso.load();
+
+  // Desbloqueo de audio: reproducir en silencio desde el primer gesto.
+  // Un elemento ya reproduciéndose nunca dispara NotAllowedError al desmutear.
+  let audioDesbloqueado = false;
+  const desbloquearAudio = () => {
+    if (audioDesbloqueado) return;
+    aplauso.muted = true;
+    aplauso.loop = true;
+    aplauso.play().then(() => {
+      audioDesbloqueado = true;
+    }).catch(() => {});
+  };
+  document.addEventListener('pointerdown', desbloquearAudio);
+  document.addEventListener('keydown', desbloquearAudio);
+
+  // Reproduce aplausos audibles desde el inicio (audio ya activo).
+  const sonarAplauso = () => {
+    aplauso.loop = false;
+    aplauso.muted = false;
+    aplauso.currentTime = 0;
+    aplauso.play().catch(err => console.warn('No se pudo reproducir audio:', err));
+  };
 
   // Initialise wheel with the Students props:
   wheel.init({
@@ -83,12 +177,14 @@ function init() {
   const button = document.getElementById("spin");
   const buttoninit = document.getElementById("spininit");
   buttoninit.addEventListener("click", e => {
-    window.location.href = `./?grado=${dropdowng.value}`;
+    // Spin en la misma página para conservar el gesto del usuario (audio).
+    desbloquearAudio();
+    button.click();
   });
   button.addEventListener('click', e => {
     const grado = dropdowng.value;
     // Desbloquea el audio dentro del gesto del usuario (política de autoplay).
-    aplauso.play().then(() => { aplauso.pause(); aplauso.currentTime = 0; }).catch(() => {});
+    desbloquearAudio();
     generate(grado); // sin grado: gira con todos los datos
     let signo = (Math.floor(0.5 - Math.random()));
     signo = signo < 0 ? signo : 1;
@@ -98,12 +194,21 @@ function init() {
      setTimeout(()=>{
       document.getElementById("canvas").style.display='none'
      },13000)
-     aplauso.currentTime = 0;
-     aplauso.play().catch(err => console.warn('No se pudo reproducir audio:', err));
+     sonarAplauso();
+     const animRnd = Math.floor(Math.random() * 5) + 1; // 1..5 aleatorio
      await Swal.fire({
       title:"Ganador",
-      html:`<h1 style='font-size:3rem;'>${wheel.items[e.currentIndex]._label}</h1>`
+      width:'90%',
+      html:`<div style='display:flex;align-items:center;justify-content:center;gap:1.5rem;flex-wrap:wrap;'>
+        <h1 class='ganador-nombre anim-${animRnd}' style='font-size:5rem;margin:0;flex:1;min-width:300px;line-height:1.1;'>${wheel.items[e.currentIndex]._label}</h1>
+        <img class='ganador-img' src='./ganador-sin-fondo.png' alt='Ganador' style='width:200px;height:auto;flex-shrink:0;'/>
+      </div>`
      })
+     // Marca el grupo como rifado y lo quita del select.
+     if (grado) {
+       addRifado(grado);
+       rellenarSelect();
+     }
     };
   })
 
